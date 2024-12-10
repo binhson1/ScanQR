@@ -13,7 +13,7 @@ public class QRCodeScanner : MonoBehaviour
     // Tham chiếu tới Text UI trong Canvas
     public TextMeshProUGUI resultText;
     public GameObject canva;
-
+    public TextMeshProUGUI secondCanvasText;
     void Start()
     {
         // Kiểm tra nếu chưa gán Text
@@ -22,6 +22,11 @@ public class QRCodeScanner : MonoBehaviour
             Debug.LogError("Chưa gán Text UI trong Canvas!");
             return;
         }
+
+        if (Display.displays.Length > 1)
+    {
+        Display.displays[1].Activate(); // Kích hoạt màn hình phụ
+    }
 
         // Khởi tạo ZXing reader
         barcodeReader = new BarcodeReader();
@@ -99,21 +104,37 @@ public class QRCodeScanner : MonoBehaviour
     }
 
     private IEnumerator HandleResult(string result)
+{
+    // Tách chuỗi từ QR
+    string[] parts = result.Split('-'); // Tách bằng dấu '-'
+    string name = parts.Length > 0 ? parts[0].Trim() : "Không rõ tên";
+    string title = parts.Length > 1 ? parts[1].Trim() : "Không rõ chức vụ";
+
+    if (Display.displays.Length > 1)
     {
-        // Hiển thị kết quả
-        resultText.text = "Chào " + result;
-        canva.SetActive(true);
-
-        // Tắt camera
-        StopCamera();
-
-        // Chờ 5 giây
-        yield return new WaitForSeconds(5);
-
-        // Ẩn kết quả và khởi động lại camera
-        canva.SetActive(false);
-        StartCamera();
+        // Hiển thị nội dung lên hai màn hình
+        Display.displays[1].Activate();
+        Debug.Log(name);
+        resultText.text = name; // Tên hiển thị ở màn hình chính
+        secondCanvasText.text = title; // Chức vụ hiển thị ở màn hình phụ
+        Debug.Log(title);
     }
+    else
+    {
+        // Hiển thị nội dung lên một màn hình
+        resultText.text = name + "\n" + title; // Xuống dòng tên và chức vụ
+    }
+
+    canva.SetActive(true);    
+    StopCamera();
+
+    yield return new WaitForSeconds(5);
+
+    canva.SetActive(false);
+    secondCanvasText.text = "";
+    StartCamera();
+}
+
 
     private bool IsValidText(string text)
     {
@@ -124,10 +145,10 @@ public class QRCodeScanner : MonoBehaviour
         }
 
         // Kiểm tra nếu chuỗi chứa số hoặc ký tự đặc biệt
-        if (Regex.IsMatch(text, @"[^\p{L}\s]")) // `\p{L}` là ký tự chữ Unicode, `\s` là khoảng trắng
-        {
-            return false;
-        }
+        // if (Regex.IsMatch(text, @"[^\p{L}\s]")) // `\p{L}` là ký tự chữ Unicode, `\s` là khoảng trắng
+        // {
+        //     return false;
+        // }
 
 
         // Nếu tất cả điều kiện đều hợp lệ
