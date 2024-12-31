@@ -72,8 +72,6 @@ public class QRCodeScanner : MonoBehaviour
             Debug.Log($"File không tồn tại: {filePath}");
             return;
         }
-
-
     }
 
     private void StartCamera()
