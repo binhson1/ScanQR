@@ -1,89 +1,110 @@
 using UnityEngine;
-using UnityEngine.UI; // For Text
-using TMPro;          // For TextMeshPro if needed
+using UnityEngine.UI; // Sử dụng Text
+using TMPro;          // Sử dụng TextMeshPro nếu cần
 
 public class ScrollingTextWithChildren : MonoBehaviour
 {
-    public float speed = 50f;                     // Speed of text movement
-    public RectTransform textTransform;          // RectTransform of the parent text
-    public float startPositionX = -500f;         // Starting position (off-screen to the left)
-    public float endPositionX = 500f;            // Ending position (off-screen to the right)
-    public GameObject textPrefab;                // Prefab for child text objects
-    public int childCount = 3;                   // Number of child text objects
-    public float childSpacing = 50f;             // Spacing between child objects
-
-    private RectTransform[] childTransforms;     // Array to store child RectTransforms
+    public float speed = 50f; // Tốc độ di chuyển
+    public RectTransform textTransform; // RectTransform của Text
+    public float startPositionX = -500f; // Vị trí bắt đầu (bên trái)
+    public float endPositionX = 500f;   // Vị trí kết thúc (bên phải)
+    public int numberOfDuplicates = 2; // Số lượng bản sao
+    
+    public int spacingPoint = 550;
+    private RectTransform[] duplicateTextTransforms; // Lưu trữ các bản sao
+    private Text textComponent;
+    private TextMeshProUGUI textMeshProComponent;
 
     private void Start()
     {
         if (textTransform == null)
         {
-            textTransform = GetComponent<RectTransform>();
+            Debug.LogError("Text Transform chưa được gán!");
+            return;
         }
 
-        // Initialize parent text at the starting position
+        // Lấy thành phần Text hoặc TextMeshPro từ textTransform
+        textComponent = textTransform.GetComponent<Text>();
+        textMeshProComponent = textTransform.GetComponent<TextMeshProUGUI>();
+
+        if (textComponent == null && textMeshProComponent == null)
+        {
+            Debug.LogError("Không tìm thấy thành phần Text hoặc TextMeshPro trong Text Transform!");
+            return;
+        }
+
+        // Khởi tạo mảng các RectTransform cho các bản sao
+        duplicateTextTransforms = new RectTransform[numberOfDuplicates];
+
+        // Đặt vị trí ban đầu cho Text gốc
         textTransform.anchoredPosition = new Vector2(startPositionX, textTransform.anchoredPosition.y);
 
-        // Create child objects
-        InitializeChildTexts();
+        // Tạo các bản sao
+        for (int i = 0; i < numberOfDuplicates; i++)
+        {
+            GameObject duplicateText = Instantiate(textTransform.gameObject, textTransform.parent);
+            RectTransform duplicateTransform = duplicateText.GetComponent<RectTransform>();
+
+            // Tính toán vị trí ban đầu của từng bản sao
+            float offset = spacingPoint * (i + 1);
+            duplicateTransform.anchoredPosition = new Vector2(startPositionX - offset, textTransform.anchoredPosition.y);
+
+            // Lưu trữ bản sao trong mảng
+            duplicateTextTransforms[i] = duplicateTransform;
+        }
     }
 
     private void Update()
     {
-        // Move the parent text from left to right
-        textTransform.anchoredPosition += new Vector2(speed * Time.deltaTime, 0);
-
-        // Loop parent text back to start if it exceeds the end position
-        if (textTransform.anchoredPosition.x > endPositionX)
+        // Đồng bộ nội dung giữa Text cha và các Text sao chép
+        if (textComponent != null)
         {
-            textTransform.anchoredPosition = new Vector2(startPositionX, textTransform.anchoredPosition.y);
-        }
-
-        // Update child texts' positions relative to the parent
-        UpdateChildPositions();
-    }
-
-    private void InitializeChildTexts()
-    {
-        // Destroy existing children if any (useful for runtime updates)
-        foreach (Transform child in transform)
-        {
-            // Destroy(child.gameObject);
-        }
-
-        // Initialize array for child RectTransforms
-        childTransforms = new RectTransform[childCount];
-
-        // Create child objects
-        for (int i = 0; i < childCount; i++)
-        {
-            GameObject newChild = Instantiate(textPrefab, transform); // Create child under parent
-            RectTransform childRect = newChild.GetComponent<RectTransform>();
-            childTransforms[i] = childRect;
-
-            // Position child relative to parent with spacing
-            float offset = -(i + 1) * childSpacing; // Negative offset to position behind parent
-            childRect.anchoredPosition = new Vector2(textTransform.anchoredPosition.x + offset, textTransform.anchoredPosition.y);
-        }
-    }
-
-    private void UpdateChildPositions()
-    {
-        // Update each child's position relative to the parent
-        for (int i = 0; i < childCount; i++)
-        {
-            if (childTransforms[i] != null)
+            foreach (var duplicateTransform in duplicateTextTransforms)
             {
-                float offset = -(i + 1) * childSpacing; // Maintain spacing
-                childTransforms[i].anchoredPosition = new Vector2(textTransform.anchoredPosition.x + offset, textTransform.anchoredPosition.y);
+                duplicateTransform.GetComponent<Text>().text = textComponent.text;
             }
         }
-    }
+        else if (textMeshProComponent != null)
+        {
+            foreach (var duplicateTransform in duplicateTextTransforms)
+            {
+                duplicateTransform.GetComponent<TextMeshProUGUI>().text = textMeshProComponent.text;
+            }
+        }
 
-    public void SetChildCount(int newCount)
-    {
-        // Update the number of child objects at runtime
-        childCount = newCount;
-        InitializeChildTexts(); // Recreate children with new count
+        // Di chuyển Text gốc
+        textTransform.anchoredPosition += new Vector2(speed * Time.deltaTime, 0);
+
+        // Di chuyển các bản sao
+        foreach (var duplicateTransform in duplicateTextTransforms)
+        {
+            duplicateTransform.anchoredPosition += new Vector2(speed * Time.deltaTime, 0);
+        }
+
+            // Xử lý khi Text gốc vượt qua vị trí kết thúc
+        if (textTransform.anchoredPosition.x > endPositionX)
+        {
+            // Đặt lại Text gốc phía sau phần tử cuối cùng
+            RectTransform lastDuplicate = duplicateTextTransforms[numberOfDuplicates - 1];
+            textTransform.anchoredPosition = new Vector2(
+                lastDuplicate.anchoredPosition.x - (spacingPoint),
+                textTransform.anchoredPosition.y
+            );
+        }
+
+        // Xử lý khi các Text sao chép vượt qua vị trí kết thúc
+        for (int i = 0; i < duplicateTextTransforms.Length; i++)
+        {
+            if (duplicateTextTransforms[i].anchoredPosition.x > endPositionX)
+            {
+                // Đặt lại Text sao chép phía sau phần tử cuối cùng
+                RectTransform previous = i == 0 ? textTransform : duplicateTextTransforms[i - 1];
+                duplicateTextTransforms[i].anchoredPosition = new Vector2(
+                    previous.anchoredPosition.x - (spacingPoint),
+                    duplicateTextTransforms[i].anchoredPosition.y
+                );
+            }
+        }
+
     }
 }
