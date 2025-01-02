@@ -42,7 +42,6 @@ public class QRCodeScanner : MonoBehaviour
             Display.displays[1].Activate();
             Display.displays[2].Activate();
             Display.displays[3].Activate();
-
         }
 
         // Khởi tạo ZXing reader
@@ -87,9 +86,6 @@ public class QRCodeScanner : MonoBehaviour
                 targetRenderer.material.mainTexture = webCamTexture;
             }
             StartCoroutine(ScanQRCode());
-            logManager.AddLog("Đã chạy được camera");
-            logManager.AddLog("Đã chạy được camera");
-            logManager.AddLog("Đã chạy được camera");
 
             Debug.Log("Đã chạy được camera");
 

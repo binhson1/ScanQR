@@ -9,7 +9,7 @@ public class ScrollingTextWithChildren : MonoBehaviour
     public float startPositionX = -500f; // Vị trí bắt đầu (bên trái)
     public float endPositionX = 500f;   // Vị trí kết thúc (bên phải)
     public int numberOfDuplicates = 2; // Số lượng bản sao
-    
+
     public int spacingPoint = 550;
     private RectTransform[] duplicateTextTransforms; // Lưu trữ các bản sao
     private Text textComponent;
@@ -56,19 +56,24 @@ public class ScrollingTextWithChildren : MonoBehaviour
 
     private void Update()
     {
-        // Đồng bộ nội dung giữa Text cha và các Text sao chép
+
+        // Đồng bộ nội dung và fontSize giữa Text cha và các Text sao chép
         if (textComponent != null)
         {
             foreach (var duplicateTransform in duplicateTextTransforms)
             {
-                duplicateTransform.GetComponent<Text>().text = textComponent.text;
+                var duplicateText = duplicateTransform.GetComponent<Text>();
+                duplicateText.text = textComponent.text;
+                duplicateText.fontSize = textComponent.fontSize;
             }
         }
         else if (textMeshProComponent != null)
         {
             foreach (var duplicateTransform in duplicateTextTransforms)
             {
-                duplicateTransform.GetComponent<TextMeshProUGUI>().text = textMeshProComponent.text;
+                var duplicateTMP = duplicateTransform.GetComponent<TextMeshProUGUI>();
+                duplicateTMP.text = textMeshProComponent.text;
+                duplicateTMP.fontSize = textMeshProComponent.fontSize;
             }
         }
 
@@ -81,10 +86,10 @@ public class ScrollingTextWithChildren : MonoBehaviour
             duplicateTransform.anchoredPosition += new Vector2(speed * Time.deltaTime, 0);
         }
 
-            // Xử lý khi Text gốc vượt qua vị trí kết thúc
+        // Xử lý khi Text gốc vượt qua vị trí kết thúc
         if (textTransform.anchoredPosition.x > endPositionX)
         {
-            // Đặt lại Text gốc phía sau phần tử cuối cùng
+            // Đặt lại Text gốc phía sau phần tử cuối cùng            
             RectTransform lastDuplicate = duplicateTextTransforms[numberOfDuplicates - 1];
             textTransform.anchoredPosition = new Vector2(
                 lastDuplicate.anchoredPosition.x - (spacingPoint),
