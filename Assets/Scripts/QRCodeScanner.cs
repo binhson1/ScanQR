@@ -16,21 +16,20 @@ public class QRCodeScanner : MonoBehaviour
     private IBarcodeReader barcodeReader;
 
     // Tham chiếu tới Text UI trong Canvas
-    public TextMeshProUGUI resultText;
+    public TextMeshProUGUI firstText;
+    public TextMeshProUGUI secondText;
     public TextMeshProUGUI thirdText;
     public TextMeshProUGUI fourthText;
-
-
-    public GameObject canva;
+    public TextMeshProUGUI nameText;
+    public int waitingTime = 5;    
     private string excelFilePath;
     private string filePath;
-    public TextMeshProUGUI secondCanvasText;
     [SerializeField] public LogManager logManager;
 
     void Start()
     {
         // Kiểm tra nếu chưa gán Text
-        if (resultText == null)
+        if (nameText == null)
         {
             Debug.LogError("Chưa gán Text UI trong Canvas!");
             // return;
@@ -138,11 +137,16 @@ public class QRCodeScanner : MonoBehaviour
                         StartCoroutine(HandleResult(result.Text));
                         yield break; // Thoát vòng lặp quét
                     }
+                    else
+                    {
+                        logManager.AddLog("Ma QR ko hop le: " + result.Text);
+                    }
                 }
             }
             catch
             {
                 Debug.LogError("Lỗi khi quét mã QR.");
+                logManager.AddLog("Lỗi khi quét mã QR.");
             }
 
             yield return new WaitForSeconds(0.5f); // Quét mỗi 0.5 giây
@@ -151,12 +155,19 @@ public class QRCodeScanner : MonoBehaviour
 
     private IEnumerator HandleResult(string result)
     {
-        // canva.SetActive(true);
         StopCamera();
 
         // Đọc dữ liệu từ file Excel
-        string name = "Không tìm thấy";
-        string honor = "Không tìm thấy";
+        string name = "";
+        string honor1 = "";
+        string honor2 = "";
+        string honor3 = "";
+        string honor4 = "";
+        string honor5 = "";
+        string honor6 = "";
+        string honor7 = "";
+
+        
         string file = filePath + "/QRCheckIn.xlsx";
         if (File.Exists(file))
         {
@@ -167,12 +178,22 @@ public class QRCodeScanner : MonoBehaviour
                 {
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++) // Bắt đầu từ hàng 2 (bỏ qua tiêu đề)
                     {
-                        string id = worksheet.Cells[row, 1].Text; // Giả sử cột ID là cột 1
+                        string id = worksheet.Cells[row, 4].Text; // Giả sử cột ID là cột 1
                         if (id == result)
                         {
-                            name = worksheet.Cells[row, 2].Text; // Giả sử cột name là cột 2
-                            honor = worksheet.Cells[row, 3].Text; // Giả sử cột honor là cột 3
+                            name = worksheet.Cells[row, 3].Text; 
+                            honor1 = worksheet.Cells[row, 10].Text;
+                            honor2 = worksheet.Cells[row, 11].Text;
+                            honor3 = worksheet.Cells[row, 12].Text;
+                            honor4 = worksheet.Cells[row, 13].Text;
+                            honor5 = worksheet.Cells[row, 14].Text;
+                            honor6 = worksheet.Cells[row, 15].Text;
+                            honor7 = worksheet.Cells[row, 16].Text;
                             break;
+                        }
+                        else
+                        {
+                            logManager.AddLog("Khong tim thay QR: " + result);
                         }
                     }
                 }
@@ -181,38 +202,35 @@ public class QRCodeScanner : MonoBehaviour
         else
         {
             Debug.LogError("Không tìm thấy file Excel tại: " + excelFilePath);
+            logManager.AddLog("Không tìm thấy file Excel tại: " + excelFilePath);
         }
 
 
         if (Display.displays.Length > 1)
         {
-            // Hiển thị nội dung lên hai màn hình
-            // Display.displays[1].Activate();
             //GIANG KHIET LY
             // Tách chuỗi theo dấu cách
             thirdText.text = name;
             string[] words = name.Split(' ');
 
             // Nối chuỗi với ký tự xuống dòng
-            resultText.text = string.Join("\n", words);
+            nameText.text = string.Join("\n", words);
             Debug.Log(name);
-            // resultText.text = string.Join("\n", words); ; // Tên hiển thị ở màn hình chính
-            secondCanvasText.text = honor; // Chức vụ hiển thị ở màn hình phụ
+            // nameText.text = string.Join("\n", words); ; // Tên hiển thị ở màn hình chính
+            // secondCanvasText.text = honor; // Chức vụ hiển thị ở màn hình phụ
             fourthText.text = "MDRT";
-            Debug.Log(honor);
+            // Debug.Log(honor);
 
         }
         else
         {
             // Hiển thị nội dung lên một màn hình
-            resultText.text = $"Name: {name}\nHonor: {honor}";
+            // nameText.text = $"Name: {name}\nHonor: {honor}";
         }
 
+        yield return new WaitForSeconds(waitingTime);
 
-        yield return new WaitForSeconds(5);
-
-        canva.SetActive(false);
-        secondCanvasText.text = "";
+        // secondCanvasText.text = "";
         StartCamera();
     }
 
@@ -235,7 +253,6 @@ public class QRCodeScanner : MonoBehaviour
         // Nếu tất cả điều kiện đều hợp lệ
         return true;
     }
-
 
     void OnDestroy()
     {
