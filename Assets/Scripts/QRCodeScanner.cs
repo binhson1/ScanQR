@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using OfficeOpenXml;
 using System.Linq;
+using System.Collections.Generic;
 
 public class QRCodeScanner : MonoBehaviour
 {
@@ -21,26 +22,25 @@ public class QRCodeScanner : MonoBehaviour
     public TextMeshProUGUI thirdText;
     public TextMeshProUGUI fourthText;
     public TextMeshProUGUI nameText;
-    public int waitingTime = 5;    
+
+    public GameObject logo1;
+    public GameObject logo2;
+    public GameObject logo3;
+    public GameObject logo4;
+
+    public int waitingTime = 5;
     private string excelFilePath;
     private string filePath;
     [SerializeField] public LogManager logManager;
 
     void Start()
     {
-        // Kiểm tra nếu chưa gán Text
-        if (nameText == null)
-        {
-            Debug.LogError("Chưa gán Text UI trong Canvas!");
-            // return;
-        }
-
         // Display.displays[1].Activate();
         if (Display.displays.Length > 1)
         {
             Display.displays[1].Activate();
-            Display.displays[2].Activate();
-            Display.displays[3].Activate();
+            //Display.displays[2].Activate();
+            //Display.displays[3].Activate();
         }
 
         // Khởi tạo ZXing reader
@@ -48,6 +48,7 @@ public class QRCodeScanner : MonoBehaviour
 
         // Bắt đầu mở camera
         StartCamera();
+        //StartCoroutine(HandleResult("ER MA8SNN99A8ULWL4XB65367LVSB"));
 
         // Bật License của EPPlus (vì từ v5, EPPlus yêu cầu bật License cho non-commercial)
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -58,18 +59,18 @@ public class QRCodeScanner : MonoBehaviour
         // Đường dẫn tới file Excel trong thư mục MyRelativeFolder
         string fileName = "Data";
         filePath = Path.Combine(baseDirectory, fileName);
-        Debug.Log(filePath);
         if (!Directory.Exists(filePath))
         {
             Directory.CreateDirectory(filePath);
         }
         // Kiểm tra file có tồn tại không
-        if (!File.Exists(filePath))
-        {
-            // logManager.AddLog($"File không tồn tại: {filePath}");
-            Debug.Log($"File không tồn tại: {filePath}");
-            return;
-        }
+        // if (!File.Exists(filePath))
+        // {
+        //     // logManager.AddLog($"File không tồn tại: {filePath}");
+        //     Debug.Log($"File không tồn tại: {filePath}");
+        //     logManager.AddLog($"File không tồn tại: {filePath}");
+        //     return;
+        // }
     }
 
     private void StartCamera()
@@ -87,6 +88,8 @@ public class QRCodeScanner : MonoBehaviour
             StartCoroutine(ScanQRCode());
 
             Debug.Log("Đã chạy được camera");
+            //logManager.AddLog("Đã chạy được camera");
+
 
         }
         else
@@ -156,7 +159,7 @@ public class QRCodeScanner : MonoBehaviour
     private IEnumerator HandleResult(string result)
     {
         StopCamera();
-
+        Debug.Log("OKEY");
         // Đọc dữ liệu từ file Excel
         string name = "";
         string honor1 = "";
@@ -167,8 +170,11 @@ public class QRCodeScanner : MonoBehaviour
         string honor6 = "";
         string honor7 = "";
 
-        
-        string file = filePath + "/QRCheckIn.xlsx";
+
+        string file = filePath + "/250102_Vinh danh_QR code-Revise.xlsx";
+        file = "D:/Unity/250102_Vinh danh_QR code-Revise.xlsx";
+        string id = "";
+
         if (File.Exists(file))
         {
             using (var package = new ExcelPackage(new FileInfo(file)))
@@ -178,10 +184,10 @@ public class QRCodeScanner : MonoBehaviour
                 {
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++) // Bắt đầu từ hàng 2 (bỏ qua tiêu đề)
                     {
-                        string id = worksheet.Cells[row, 4].Text; // Giả sử cột ID là cột 1
+                        id = worksheet.Cells[row, 4].Text; // Giả sử cột ID là cột 1
                         if (id == result)
-                        {
-                            name = worksheet.Cells[row, 3].Text; 
+                        {            
+                            name = worksheet.Cells[row, 3].Text;
                             honor1 = worksheet.Cells[row, 10].Text;
                             honor2 = worksheet.Cells[row, 11].Text;
                             honor3 = worksheet.Cells[row, 12].Text;
@@ -191,10 +197,11 @@ public class QRCodeScanner : MonoBehaviour
                             honor7 = worksheet.Cells[row, 16].Text;
                             break;
                         }
-                        else
-                        {
-                            logManager.AddLog("Khong tim thay QR: " + result);
-                        }
+                    }
+                    if (id != result)
+                    {
+                        logManager.AddLog("Khong tim thay QR: " + result);
+                        Debug.Log("Khong tim thay QR: " + result);
                     }
                 }
             }
@@ -204,36 +211,78 @@ public class QRCodeScanner : MonoBehaviour
             Debug.LogError("Không tìm thấy file Excel tại: " + excelFilePath);
             logManager.AddLog("Không tìm thấy file Excel tại: " + excelFilePath);
         }
-
-
-        if (Display.displays.Length > 1)
+        if (id == result)
         {
-            //GIANG KHIET LY
-            // Tách chuỗi theo dấu cách
-            thirdText.text = name;
-            string[] words = name.Split(' ');
+            // Đặt lại tất cả các Text trước khi hiển thị dữ liệu mới
+            firstText.text = "";
+            secondText.text = "";
+            thirdText.text = "";
+            fourthText.text = "";
 
-            // Nối chuỗi với ký tự xuống dòng
-            nameText.text = string.Join("\n", words);
-            Debug.Log(name);
-            // nameText.text = string.Join("\n", words); ; // Tên hiển thị ở màn hình chính
-            // secondCanvasText.text = honor; // Chức vụ hiển thị ở màn hình phụ
-            fourthText.text = "MDRT";
-            // Debug.Log(honor);
+            // Hiển thị tên
+            nameText.text = " • " + name;
 
-        }
-        else
-        {
-            // Hiển thị nội dung lên một màn hình
-            // nameText.text = $"Name: {name}\nHonor: {honor}";
+            // Hiển thị dữ liệu honor
+            List<string> honors = new List<string> { honor1, honor2, honor3, honor4, honor5, honor6, honor7 };
+            int textIndex = 0; // Chỉ số để theo dõi Text đang sử dụng
+
+            for (int i = 0; i < honors.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(honors[i])) // Kiểm tra nếu dữ liệu honor không rỗng
+                {
+                    switch(textIndex)
+                    {
+                        case 0:
+                            firstText.text = honors[i];
+                            textIndex++;
+                            break;
+                        case 1:
+                            secondText.text = honors[i];
+                            textIndex++;
+                            break;
+                        case 2:
+                            thirdText.text = honors[i];
+                            textIndex++;
+                            break;
+                        case 3:
+                            fourthText.text = honors[i];
+                            textIndex++;
+                            break;
+                        case 4:
+                            firstText.text += "\n" + honors[i];
+                            textIndex++;
+                            break;
+                        case 5:
+                            thirdText.text += "\n" + honors[i];
+                            textIndex++;
+                            break;
+                        case 6:
+                            fourthText.text += "\n" + honors[i];
+                            textIndex++;
+                            break;
+                    }
+                }
+            }
+
+            // Nếu thiếu dữ liệu, kích hoạt các logo tương ứng
+            if (string.IsNullOrEmpty(firstText.text)) logo1.SetActive(true);
+            if (string.IsNullOrEmpty(secondText.text)) logo2.SetActive(true);
+            if (string.IsNullOrEmpty(thirdText.text)) logo3.SetActive(true);
+            if (string.IsNullOrEmpty(fourthText.text)) logo4.SetActive(true);
         }
 
         yield return new WaitForSeconds(waitingTime);
-
-        // secondCanvasText.text = "";
+        firstText.text = "";
+        secondText.text = "";
+        thirdText.text = "";
+        fourthText.text = "";
+        nameText.text = "";
+        logo1.SetActive(false);
+        logo2.SetActive(false);
+        logo3.SetActive(false);
+        logo4.SetActive(false);
         StartCamera();
     }
-
 
     private bool IsValidText(string text)
     {
