@@ -5,7 +5,7 @@ using TMPro;
 public class ScrollingTextController : MonoBehaviour
 {
     // Tham chiếu đến các thành phần UI
-    public ScrollingTextWithChildren scrollingTextScript; // Tham chiếu đến Script ScrollingTextWithChildren
+    public ScrollingTextWithPrefab scrollingTextScript; // Tham chiếu đến Script ScrollingTextWithChildren
     public TMP_InputField speedSlider; // Slider điều chỉnh tốc độ
     public TMP_InputField startPosInput; // InputField cho startPositionX
     public TMP_InputField endPosInput;   // InputField cho endPositionX
@@ -33,6 +33,10 @@ public class ScrollingTextController : MonoBehaviour
     }
 
     // Hàm cập nhật tốc độ
+    private void UpdateScale(string value)
+    {
+
+    }
     private void UpdateSpeed(string value)
     {
         if (float.TryParse(value, out float newSpeednewSpeed))

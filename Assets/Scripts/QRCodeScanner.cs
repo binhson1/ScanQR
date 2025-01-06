@@ -39,8 +39,10 @@ public class QRCodeScanner : MonoBehaviour
         if (Display.displays.Length > 1)
         {
             Display.displays[1].Activate();
-            //Display.displays[2].Activate();
-            //Display.displays[3].Activate();
+            Display.displays[2].Activate();
+            Display.displays[3].Activate();
+            Display.displays[4].Activate();
+            Display.displays[5].Activate();
         }
 
         // Khởi tạo ZXing reader
@@ -64,13 +66,13 @@ public class QRCodeScanner : MonoBehaviour
             Directory.CreateDirectory(filePath);
         }
         // Kiểm tra file có tồn tại không
-        // if (!File.Exists(filePath))
-        // {
-        //     // logManager.AddLog($"File không tồn tại: {filePath}");
-        //     Debug.Log($"File không tồn tại: {filePath}");
-        //     logManager.AddLog($"File không tồn tại: {filePath}");
-        //     return;
-        // }
+        if (!File.Exists(filePath))
+        {
+            // logManager.AddLog($"File không tồn tại: {filePath}");
+            Debug.Log($"File không tồn tại: {filePath}");
+            logManager.AddLog($"File không tồn tại: {filePath}");
+            return;
+        }
     }
 
     private void StartCamera()
@@ -89,7 +91,6 @@ public class QRCodeScanner : MonoBehaviour
 
             Debug.Log("Đã chạy được camera");
             //logManager.AddLog("Đã chạy được camera");
-
 
         }
         else
@@ -137,7 +138,7 @@ public class QRCodeScanner : MonoBehaviour
                     if (IsValidText(result.Text))
                     {
                         // Hiển thị kết quả và dừng camera
-                        StartCoroutine(HandleResult(result.Text));
+                        HandleResult(result.Text);
                         yield break; // Thoát vòng lặp quét
                     }
                     else
@@ -152,14 +153,15 @@ public class QRCodeScanner : MonoBehaviour
                 logManager.AddLog("Lỗi khi quét mã QR.");
             }
 
-            yield return new WaitForSeconds(0.5f); // Quét mỗi 0.5 giây
+            yield return new WaitForSeconds(2f); // Quét mỗi giây
         }
     }
 
-    private IEnumerator HandleResult(string result)
+
+    private void HandleResult(string result)
     {
-        StopCamera();
-        Debug.Log("OKEY");
+        // StopCamera();
+        // Debug.Log("OKEY");
         // Đọc dữ liệu từ file Excel
         string name = "";
         string honor1 = "";
@@ -171,8 +173,9 @@ public class QRCodeScanner : MonoBehaviour
         string honor7 = "";
 
 
-        string file = filePath + "/250102_Vinh danh_QR code-Revise.xlsx";
-        file = "D:/Unity/250102_Vinh danh_QR code-Revise.xlsx";
+        string file = filePath + "/QR code foyer to EG final_05012025.xlsx";
+        // file = "D:/Unity/250102_Vinh danh_QR code-Revise.xlsx";
+        // file = "D:/Unity/QR code foyer to EG final_05012025.xlsx";
         string id = "";
 
         if (File.Exists(file))
@@ -186,15 +189,15 @@ public class QRCodeScanner : MonoBehaviour
                     {
                         id = worksheet.Cells[row, 4].Text; // Giả sử cột ID là cột 1
                         if (id == result)
-                        {            
+                        {
                             name = worksheet.Cells[row, 3].Text;
-                            honor1 = worksheet.Cells[row, 10].Text;
-                            honor2 = worksheet.Cells[row, 11].Text;
-                            honor3 = worksheet.Cells[row, 12].Text;
-                            honor4 = worksheet.Cells[row, 13].Text;
-                            honor5 = worksheet.Cells[row, 14].Text;
-                            honor6 = worksheet.Cells[row, 15].Text;
-                            honor7 = worksheet.Cells[row, 16].Text;
+                            honor1 = worksheet.Cells[row, 6].Text;
+                            honor2 = worksheet.Cells[row, 7].Text;
+                            honor3 = worksheet.Cells[row, 8].Text;
+                            honor4 = worksheet.Cells[row, 9].Text;
+                            honor5 = worksheet.Cells[row, 10].Text;
+                            honor6 = worksheet.Cells[row, 11].Text;
+                            honor7 = worksheet.Cells[row, 12].Text;
                             break;
                         }
                     }
@@ -214,13 +217,18 @@ public class QRCodeScanner : MonoBehaviour
         if (id == result)
         {
             // Đặt lại tất cả các Text trước khi hiển thị dữ liệu mới
+            logo1.SetActive(false);
+            logo2.SetActive(false);
+            logo3.SetActive(false);
+            logo4.SetActive(false);
+            nameText.text = "";
             firstText.text = "";
             secondText.text = "";
             thirdText.text = "";
             fourthText.text = "";
 
             // Hiển thị tên
-            nameText.text = " • " + name;
+            nameText.text = name;
 
             // Hiển thị dữ liệu honor
             List<string> honors = new List<string> { honor1, honor2, honor3, honor4, honor5, honor6, honor7 };
@@ -230,7 +238,7 @@ public class QRCodeScanner : MonoBehaviour
             {
                 if (!string.IsNullOrEmpty(honors[i])) // Kiểm tra nếu dữ liệu honor không rỗng
                 {
-                    switch(textIndex)
+                    switch (textIndex)
                     {
                         case 0:
                             firstText.text = honors[i];
@@ -271,23 +279,24 @@ public class QRCodeScanner : MonoBehaviour
             if (string.IsNullOrEmpty(fourthText.text)) logo4.SetActive(true);
         }
 
-        yield return new WaitForSeconds(waitingTime);
-        firstText.text = "";
-        secondText.text = "";
-        thirdText.text = "";
-        fourthText.text = "";
-        nameText.text = "";
-        logo1.SetActive(false);
-        logo2.SetActive(false);
-        logo3.SetActive(false);
-        logo4.SetActive(false);
-        StartCamera();
+        // yield return new WaitForSeconds(waitingTime);
+        // firstText.text = "";
+        // secondText.text = "";
+        // thirdText.text = "";
+        // fourthText.text = "";
+
+        // StartCamera();
     }
 
     private bool IsValidText(string text)
     {
         // Kiểm tra nếu chuỗi là một liên kết
         if (text.StartsWith("http://") || text.StartsWith("https://"))
+        {
+            return false;
+        }
+
+        if (text == "")
         {
             return false;
         }
@@ -302,6 +311,7 @@ public class QRCodeScanner : MonoBehaviour
         // Nếu tất cả điều kiện đều hợp lệ
         return true;
     }
+
 
     void OnDestroy()
     {
