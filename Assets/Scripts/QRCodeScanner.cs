@@ -27,10 +27,16 @@ public class QRCodeScanner : MonoBehaviour
     public GameObject logo2;
     public GameObject logo3;
     public GameObject logo4;
-
+    public GameObject dot;
+    public GameObject ui1;
+    public GameObject ui2;
+    public GameObject ui3;
+    public GameObject ui4;
     public int waitingTime = 5;
     private string excelFilePath;
     private string filePath;
+    public TMP_InputField watingInput; // Slider điều chỉnh tốc độ
+
     [SerializeField] public LogManager logManager;
 
     void Start()
@@ -38,19 +44,22 @@ public class QRCodeScanner : MonoBehaviour
         // Display.displays[1].Activate();
         if (Display.displays.Length > 1)
         {
-            Display.displays[1].Activate();
-            Display.displays[2].Activate();
-            Display.displays[3].Activate();
-            Display.displays[4].Activate();
-            Display.displays[5].Activate();
+            // Display.displays[1].Activate();
+            // Display.displays[2].Activate();
+            // Display.displays[3].Activate();
+            // Display.displays[4].Activate();
+            // Display.displays[5].Activate();
         }
+        watingInput.text = waitingTime.ToString();
+        watingInput.onEndEdit.AddListener(UpdateWaitingTime);
 
+        // dot.SetActive(false);
         // Khởi tạo ZXing reader
         barcodeReader = new BarcodeReader();
 
         // Bắt đầu mở camera
         StartCamera();
-        //StartCoroutine(HandleResult("ER MA8SNN99A8ULWL4XB65367LVSB"));
+        // HandleResult("ER CUGHD27JUNV8E2L2H8P9M4SWSA");
 
         // Bật License của EPPlus (vì từ v5, EPPlus yêu cầu bật License cho non-commercial)
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -66,13 +75,13 @@ public class QRCodeScanner : MonoBehaviour
             Directory.CreateDirectory(filePath);
         }
         // Kiểm tra file có tồn tại không
-        if (!File.Exists(filePath))
-        {
-            // logManager.AddLog($"File không tồn tại: {filePath}");
-            Debug.Log($"File không tồn tại: {filePath}");
-            logManager.AddLog($"File không tồn tại: {filePath}");
-            return;
-        }
+        // if (!File.Exists(filePath))
+        // {
+        //     // logManager.AddLog($"File không tồn tại: {filePath}");
+        //     Debug.Log($"File không tồn tại: {filePath}");
+        //     logManager.AddLog($"File không tồn tại: {filePath}");
+        //     return;
+        // }
     }
 
     private void StartCamera()
@@ -157,10 +166,14 @@ public class QRCodeScanner : MonoBehaviour
         }
     }
 
+    public void ClickButton()
+    {
+        HandleResult("ER CUGHD27JUNV8E2L2H8P9M4SWSA");
+    }
 
     private void HandleResult(string result)
     {
-        // StopCamera();
+        StopCamera();
         // Debug.Log("OKEY");
         // Đọc dữ liệu từ file Excel
         string name = "";
@@ -173,11 +186,11 @@ public class QRCodeScanner : MonoBehaviour
         string honor7 = "";
 
 
-        string file = filePath + "/QR code foyer to EG final_05012025.xlsx";
+        string file = filePath + "/1.xlsx";
         // file = "D:/Unity/250102_Vinh danh_QR code-Revise.xlsx";
-        // file = "D:/Unity/QR code foyer to EG final_05012025.xlsx";
+        // file = "D:/Unity/1.xlsx";
         string id = "";
-
+        bool isFound = false;
         if (File.Exists(file))
         {
             using (var package = new ExcelPackage(new FileInfo(file)))
@@ -190,18 +203,67 @@ public class QRCodeScanner : MonoBehaviour
                         id = worksheet.Cells[row, 4].Text; // Giả sử cột ID là cột 1
                         if (id == result)
                         {
+                            isFound = true;
                             name = worksheet.Cells[row, 3].Text;
-                            honor1 = worksheet.Cells[row, 6].Text;
-                            honor2 = worksheet.Cells[row, 7].Text;
-                            honor3 = worksheet.Cells[row, 8].Text;
-                            honor4 = worksheet.Cells[row, 9].Text;
-                            honor5 = worksheet.Cells[row, 10].Text;
-                            honor6 = worksheet.Cells[row, 11].Text;
-                            honor7 = worksheet.Cells[row, 12].Text;
+
+                            // Tạo chuỗi mới và sau đó cộng vào chuỗi cũ
+                            // Kiểm tra dữ liệu trước khi cộng vào
+                            string newHonor1 = worksheet.Cells[row, 6].Text;
+                            if (!string.IsNullOrEmpty(newHonor1))
+                            {
+                                if (!string.IsNullOrEmpty(honor1)) honor1 += "\n";
+                                honor1 += newHonor1;
+                            }
+
+                            string newHonor2 = worksheet.Cells[row, 7].Text;
+                            if (!string.IsNullOrEmpty(newHonor2))
+                            {
+                                if (!string.IsNullOrEmpty(honor2)) honor2 += "\n";
+                                honor2 += newHonor2;
+                            }
+
+                            string newHonor3 = worksheet.Cells[row, 8].Text;
+                            if (!string.IsNullOrEmpty(newHonor3))
+                            {
+                                if (!string.IsNullOrEmpty(honor3)) honor3 += "\n";
+                                honor3 += newHonor3;
+                            }
+
+                            string newHonor4 = worksheet.Cells[row, 9].Text;
+                            if (!string.IsNullOrEmpty(newHonor4))
+                            {
+                                if (!string.IsNullOrEmpty(honor4)) honor4 += "\n";
+                                honor4 += newHonor4;
+                            }
+
+                            string newHonor5 = worksheet.Cells[row, 10].Text;
+                            if (!string.IsNullOrEmpty(newHonor5))
+                            {
+                                if (!string.IsNullOrEmpty(honor5)) honor5 += "\n";
+                                honor5 += newHonor5;
+                            }
+
+                            string newHonor6 = worksheet.Cells[row, 11].Text;
+                            if (!string.IsNullOrEmpty(newHonor6))
+                            {
+                                if (!string.IsNullOrEmpty(honor6)) honor6 += "\n";
+                                honor6 += newHonor6;
+                            }
+
+                            string newHonor7 = worksheet.Cells[row, 12].Text;
+                            if (!string.IsNullOrEmpty(newHonor7))
+                            {
+                                if (!string.IsNullOrEmpty(honor7)) honor7 += "\n";
+                                honor7 += newHonor7;
+                            }
+                        }
+
+                        if (id != result && isFound)
+                        {
                             break;
                         }
                     }
-                    if (id != result)
+                    if (!isFound)
                     {
                         logManager.AddLog("Khong tim thay QR: " + result);
                         Debug.Log("Khong tim thay QR: " + result);
@@ -214,14 +276,19 @@ public class QRCodeScanner : MonoBehaviour
             Debug.LogError("Không tìm thấy file Excel tại: " + excelFilePath);
             logManager.AddLog("Không tìm thấy file Excel tại: " + excelFilePath);
         }
-        if (id == result)
+        if (isFound)
         {
+            // dot.SetActive(true);
             // Đặt lại tất cả các Text trước khi hiển thị dữ liệu mới
             logo1.SetActive(false);
             logo2.SetActive(false);
             logo3.SetActive(false);
             logo4.SetActive(false);
-            nameText.text = "";
+            ui1.SetActive(false);
+            ui2.SetActive(false);
+            ui3.SetActive(false);
+            ui4.SetActive(false);
+            nameText.text = "MDRT";
             firstText.text = "";
             secondText.text = "";
             thirdText.text = "";
@@ -280,14 +347,37 @@ public class QRCodeScanner : MonoBehaviour
         }
 
         // yield return new WaitForSeconds(waitingTime);
+        // viết hàm riêng để gọi lên chạy sau 5s gì đó
         // firstText.text = "";
         // secondText.text = "";
         // thirdText.text = "";
         // fourthText.text = "";
-
-        // StartCamera();
+        CancelInvoke("StopUI");
+        Invoke("StopUI", waitingTime);
+        StartCamera();
     }
 
+    private void StopUI()
+    {
+        // if (isShow)
+        {
+            firstText.text = "";
+            secondText.text = "";
+            thirdText.text = "";
+            fourthText.text = "";
+            nameText.text = "MDRT";
+            logo1.SetActive(false);
+            logo2.SetActive(false);
+            logo3.SetActive(false);
+            logo4.SetActive(false);
+            ui1.SetActive(true);
+            ui2.SetActive(true);
+            ui3.SetActive(true);
+            ui4.SetActive(true);
+            // isShow = true;
+        }
+
+    }
     private bool IsValidText(string text)
     {
         // Kiểm tra nếu chuỗi là một liên kết
@@ -312,6 +402,13 @@ public class QRCodeScanner : MonoBehaviour
         return true;
     }
 
+    private void UpdateWaitingTime(string value)
+    {
+        if (int.TryParse(value, out int newWaitingTime))
+        {
+            waitingTime = newWaitingTime;
+        }
+    }
 
     void OnDestroy()
     {

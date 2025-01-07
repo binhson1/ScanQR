@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "    \u2022"
+  m_text: "\u2022"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ca4ba19a3b8aec94288a1e4530e68c0a, type: 2}
   m_sharedMaterial: {fileID: -1985515997735666200, guid: ca4ba19a3b8aec94288a1e4530e68c0a, type: 2}

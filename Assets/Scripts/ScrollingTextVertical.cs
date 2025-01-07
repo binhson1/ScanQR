@@ -2,25 +2,21 @@ using UnityEngine;
 using UnityEngine.UI; // Sử dụng Text
 using TMPro;          // Sử dụng TextMeshPro nếu cần
 
-public class ScrollingTextWithChildren : MonoBehaviour
+public class ScrollingTextVertical : MonoBehaviour
 {
     public float speed = 50f; // Tốc độ di chuyển
     public RectTransform textTransform; // RectTransform của Text
-    public float startPositionX = -500f; // Vị trí bắt đầu (bên trái)
-    public float endPositionX = 500f;   // Vị trí kết thúc (bên phải)
+    public float startPositionY = 500f; // Vị trí bắt đầu (trên cùng)
+    public float endPositionY = -500f;  // Vị trí kết thúc (dưới cùng)
     public int numberOfDuplicates = 2; // Số lượng bản sao
-    public int spacingPoint = 550;
+    public int spacingPoint = 550;     // Khoảng cách giữa các bản sao
+
     private RectTransform[] duplicateTextTransforms; // Lưu trữ các bản sao
     private Text textComponent;
     private TextMeshProUGUI textMeshProComponent;
-    public TMP_InputField speedSlider; // Slider điều chỉnh tốc độ
-
 
     private void Start()
     {
-        speedSlider.text = speed.ToString();
-        speedSlider.onEndEdit.AddListener(UpdateSpeed);
-
         if (textTransform == null)
         {
             Debug.LogError("Text Transform chưa được gán!");
@@ -41,7 +37,7 @@ public class ScrollingTextWithChildren : MonoBehaviour
         duplicateTextTransforms = new RectTransform[numberOfDuplicates];
 
         // Đặt vị trí ban đầu cho Text gốc
-        textTransform.anchoredPosition = new Vector2(startPositionX, textTransform.anchoredPosition.y);
+        textTransform.anchoredPosition = new Vector2(textTransform.anchoredPosition.x, startPositionY);
 
         // Tạo các bản sao
         for (int i = 0; i < numberOfDuplicates; i++)
@@ -51,76 +47,47 @@ public class ScrollingTextWithChildren : MonoBehaviour
 
             // Tính toán vị trí ban đầu của từng bản sao
             float offset = spacingPoint * (i + 1);
-            duplicateTransform.anchoredPosition = new Vector2(startPositionX - offset, textTransform.anchoredPosition.y);
+            duplicateTransform.anchoredPosition = new Vector2(textTransform.anchoredPosition.x, startPositionY + offset);
 
             // Lưu trữ bản sao trong mảng
             duplicateTextTransforms[i] = duplicateTransform;
         }
     }
 
-    private void UpdateSpeed(string value)
-    {
-        if (float.TryParse(value, out float newSpeednewSpeed))
-        {
-            speed = newSpeednewSpeed;
-        }
-    }
     private void Update()
     {
-
-        // Đồng bộ nội dung và fontSize giữa Text cha và các Text sao chép
-        // if (textComponent != null)
-        // {
-        //     foreach (var duplicateTransform in duplicateTextTransforms)
-        //     {
-        //         var duplicateText = duplicateTransform.GetComponent<Text>();
-        //         duplicateText.text = textComponent.text;
-        //         duplicateText.fontSize = textComponent.fontSize;
-        //     }
-        // }
-        // else if (textMeshProComponent != null)
-        // {
-        //     foreach (var duplicateTransform in duplicateTextTransforms)
-        //     {
-        //         var duplicateTMP = duplicateTransform.GetComponent<TextMeshProUGUI>();
-        //         duplicateTMP.text = textMeshProComponent.text;
-        //         duplicateTMP.fontSize = textMeshProComponent.fontSize;
-        //     }
-        // }
-
         // Di chuyển Text gốc
-        textTransform.anchoredPosition += new Vector2(speed * Time.deltaTime, 0);
+        textTransform.anchoredPosition += new Vector2(0, -speed * Time.deltaTime);
 
         // Di chuyển các bản sao
         foreach (var duplicateTransform in duplicateTextTransforms)
         {
-            duplicateTransform.anchoredPosition += new Vector2(speed * Time.deltaTime, 0);
+            duplicateTransform.anchoredPosition += new Vector2(0, -speed * Time.deltaTime);
         }
 
         // Xử lý khi Text gốc vượt qua vị trí kết thúc
-        if (textTransform.anchoredPosition.x > endPositionX)
+        if (textTransform.anchoredPosition.y < endPositionY)
         {
-            // Đặt lại Text gốc phía sau phần tử cuối cùng            
+            // Đặt lại Text gốc phía trên phần tử cuối cùng
             RectTransform lastDuplicate = duplicateTextTransforms[numberOfDuplicates - 1];
             textTransform.anchoredPosition = new Vector2(
-                lastDuplicate.anchoredPosition.x - (spacingPoint),
-                textTransform.anchoredPosition.y
+                textTransform.anchoredPosition.x,
+                lastDuplicate.anchoredPosition.y + spacingPoint
             );
         }
 
         // Xử lý khi các Text sao chép vượt qua vị trí kết thúc
         for (int i = 0; i < duplicateTextTransforms.Length; i++)
         {
-            if (duplicateTextTransforms[i].anchoredPosition.x > endPositionX)
+            if (duplicateTextTransforms[i].anchoredPosition.y < endPositionY)
             {
-                // Đặt lại Text sao chép phía sau phần tử cuối cùng
+                // Đặt lại Text sao chép phía trên phần tử cuối cùng
                 RectTransform previous = i == 0 ? textTransform : duplicateTextTransforms[i - 1];
                 duplicateTextTransforms[i].anchoredPosition = new Vector2(
-                    previous.anchoredPosition.x - (spacingPoint),
-                    duplicateTextTransforms[i].anchoredPosition.y
+                    duplicateTextTransforms[i].anchoredPosition.x,
+                    previous.anchoredPosition.y + spacingPoint
                 );
             }
         }
-
     }
 }

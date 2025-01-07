@@ -1775,7 +1775,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000002861023, y: 0}
+  m_AnchoredPosition: {x: -4.2, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &148458069
@@ -10345,7 +10345,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000002861023, y: 0}
+  m_AnchoredPosition: {x: -4.2, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &631875921
@@ -11684,7 +11684,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000002861023, y: 0}
+  m_AnchoredPosition: {x: -4.2, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &720233303
@@ -14250,7 +14250,6 @@ GameObject:
   - component: {fileID: 921113043}
   - component: {fileID: 921113042}
   - component: {fileID: 921113047}
-  - component: {fileID: 921113048}
   m_Layer: 5
   m_Name: Canvas (3) Run
   m_TagString: Untagged
@@ -14354,33 +14353,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6262d5161e888f46af1bc5bb77bbb9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 200
+  speed: 50
   textTransform: {fileID: 1180923894}
-  startPositionX: 800
-  endPositionX: 900
+  startPositionX: -100
+  endPositionX: 200
   numberOfDuplicates: 6
-  spacingPoint: 500
-  prefab: {fileID: 7702542783866977540, guid: 053e340f22e3db04f8949e3c0ba74301, type: 3}
+  spacingPoint: 70
+  prefab: {fileID: 7702542783866977540, guid: 6eedecaebd2343b49af3e286554ce641, type: 3}
   height: 1
---- !u!114 &921113048
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 921113040}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5432bd71703a2b4f86d8489fd0eaaee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 200
-  textTransform: {fileID: 1180923894}
-  startPositionX: 800
-  endPositionX: 900
-  numberOfDuplicates: 6
-  spacingPoint: 290
-  speedSlider: {fileID: 0}
 --- !u!1 &922091470
 GameObject:
   m_ObjectHideFlags: 0
@@ -18304,7 +18284,7 @@ RectTransform:
   m_GameObject: {fileID: 1180923891}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.8000001, y: 1.8000001, z: 1.8000001}
+  m_LocalScale: {x: 0.15882392, y: 0.15882392, z: 0.15882392}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1831316020}
