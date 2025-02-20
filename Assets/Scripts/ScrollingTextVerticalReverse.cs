@@ -56,6 +56,24 @@ public class ScrollingTextVerticalReverse : MonoBehaviour
 
     private void Update()
     {
+        if (textComponent != null)
+        {
+            foreach (var duplicateTransform in duplicateTextTransforms)
+            {
+                var duplicateText = duplicateTransform.GetComponent<Text>();
+                duplicateText.text = textComponent.text;
+                duplicateText.fontSize = textComponent.fontSize;
+            }
+        }
+        else if (textMeshProComponent != null)
+        {
+            foreach (var duplicateTransform in duplicateTextTransforms)
+            {
+                var duplicateTMP = duplicateTransform.GetComponent<TextMeshProUGUI>();
+                duplicateTMP.text = textMeshProComponent.text;
+                duplicateTMP.fontSize = textMeshProComponent.fontSize;
+            }
+        }
         // Di chuyển Text gốc
         textTransform.anchoredPosition += new Vector2(0, speed * Time.deltaTime);
 

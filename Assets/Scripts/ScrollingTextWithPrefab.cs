@@ -51,7 +51,7 @@ public class ScrollingTextWithPrefab : MonoBehaviour
         // Instantiate prefab cho Text gốc
         prefabInstance = Instantiate(prefab, textTransform);
         prefabInstance.GetComponent<RectTransform>().anchoredPosition = new Vector2(
-            textTransform.rect.width + 90,
+            textTransform.rect.width - 15,
             height
         );
 
@@ -95,7 +95,7 @@ public class ScrollingTextWithPrefab : MonoBehaviour
         // Di chuyển Text gốc và prefab của nó
         textTransform.anchoredPosition += new Vector2(speed * Time.deltaTime, 0);
         prefabInstance.GetComponent<RectTransform>().anchoredPosition = new Vector2(
-            textTransform.rect.width + 90,
+            textTransform.rect.width - 15,
             height
         );
 
